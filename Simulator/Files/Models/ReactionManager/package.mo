@@ -1,88 +1,18 @@
 within Simulator.Files.Models;
 
-package ReactionManager
-      function Stoichiometrycheck
-    //This functions checks the stoichiometry of the reaction we have given and returns "1" as output if the stoichiometry is okay and returns 0 otherwise.
-    input Integer Nr"No. of Reactions";
-    input Integer NOC"Nomber of components in the required reactions";
-    input Real MW[NOC]"Molecular weight";
-    input Real Sc[NOC,Nr]"Reaction coefficients";
-    output Integer Check[Nr];
-    
-    protected
-    Real D[Nr]=fill(0,Nr);
-    
-    algorithm
-    for i in 1:Nr loop
-      for j in 1:NOC loop
-        D[i]:=D[i]+(MW[j]*Sc[j,i]);
-      end for;
-      if D[i]<=0.1 and D[i]>=-0.1 then
-      Check[i]:=1;
-      else 
-      Check[i]:=0;
-      end if;
-    end for;
-    end Stoichiometrycheck;
-    
-    
-    function Arhenious
-    // Reaction rate constant k = A*exp(-E/RT)
-      input Integer Nr ;    
-      input Real A1 "To calulate reaction rate for forward reaction (Arrhenius constants of forward reaction)";
-      input Real E1 "To calculate reaction rate for forward reaction";
-      input Real T;
-      
-      output Real k1 "reaction rate constants for forward reaction";
-      
-    algorithm
-     
-      k1 := A1 .* exp(-E1/(8.314*T));
-    
-      
-    end Arhenious;
-    
-    
-       
-    model Reaction_Manager
-    //===================================================================================================
-    import Simulator.Files.*;
-    import data = Simulator.Files.Chemsep_Database;
-    
-    parameter Chemsep_Database.General_Properties comp[NOC];
-    
-    parameter Integer NOC;
-    parameter Integer Nr;   //Number of Reactions involved in the process
-    parameter Integer Bc[Nr]  "Base component of reactions";
-    parameter Integer Comp;    
-//Number of components involved in the reaction
+package ReactionManager "Package with functions and reactions used in different reaction systems"
+  extends Modelica.Icons.Package;
+   
 
-    parameter Real Sc[NOC,Nr];  //Stochiometry of reactions
-    parameter Real DO[NOC,Nr];  //Direct order of reactions
-    parameter Real RO[NOC,Nr]; //Reverse order of reactions
-    Real Stoic_Check[Nr];    
 
-//Returns whether the specified stoichiometry is correct
 
-    Real HOF_comp[NOC];
-    Real HOR[Nr];
-    
-    parameter Real A1[Nr]"Arrhenius constants of forward reaction";
-    parameter Real E1[Nr]"Activation Energy of the forward reaction";
-    parameter Real A2[Nr]"Arrhenius constants of reverse reaction";
-    parameter Real E2[Nr]"Activation Energy for the reverse reaction";
-    
-    equation
 
-//Check of stoichiometric balance
-          Stoic_Check = Stoichiometrycheck(Nr, NOC, comp[:].MW, Sc);
-//Calculation of Heat of Reaction
-          HOF_comp[:] = comp[:].IGHF .* 1E-3;
-//=============================================================================================
-          for i in 1:Nr loop
-            HOR[i] = (sum(HOF_comp[:] .* Sc[:, i]))/Bc[i];
-          end for;
-    end Reaction_Manager;
 
-//==============================================================================================
+
+
+
+
+
+  annotation(
+    Documentation(info = "<html><head></head><body>This is a package of different functions and models for required for simulating different reactors available under this package. Currently, following functions and models are available:<div><ol><li>Stoichiometrycheck - Function to check the stoichiometric balance of a reaction equation</li><li>Arhenious - Function to calcculate the Arrhenius rate constant from pre-exponential factor and frequency factor</li><li>BaseCalc - Function to determine the base component/limiting component in a reaction</li><li><a href=\"modelica://Simulator.Files.Models.ReactionManager.ConversionReaction\" style=\"font-size: 12px;\">Conversion Reaction</a>&nbsp;- Model of Conversion Reaction used in a Conversion Reactor</li><li><a href=\"modelica://Simulator.Files.Models.ReactionManager.KineticReaction\" style=\"font-size: 12px;\">Kinetic Reaction</a>&nbsp;-&nbsp;Model of Kinetic Reaction used in PFR/CSTR</li><li><a href=\"modelica://Simulator.Files.Models.ReactionManager.EquilibriumReaction\" style=\"font-size: 12px;\">Equilibrium Reaction</a>&nbsp;-&nbsp;Model of Equilibrium Reaction used in an Equilibrium Reactor</li></ol></div></body></html>"));
 end ReactionManager;
